@@ -1,12 +1,13 @@
 import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { User } from 'src/user/entity/user.entity';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() body: any) {
+  async register(@Body() body: User) {
     return this.authService.register(body);
   }
 
