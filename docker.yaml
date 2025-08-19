@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  # Backend (NestJS app)
+  app:
+    build: .
+    container_name: nest_app
+    restart: always
+    command: npm run start:dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:sachini@db:5432/contact-management
+      NODE_ENV: development
+
+  # PostgreSQL Database
+  db:
+    image: postgres:15
+    container_name: nest_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: sachini
+      POSTGRES_DB: contact-management
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  - .:/usr/src/app
+  - /usr/src/app/node_modules
+
