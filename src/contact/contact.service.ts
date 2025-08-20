@@ -35,7 +35,7 @@ export class ContactsService {
 
     async findAll(user: User, selectedUserId: string, page: number, limit: number, search: string, sortBy: string, order: string) {
         try {
-            this.logger.log(`create() : Fetch all contacts`)
+            this.logger.log(`findAll() : Fetch all contacts`)
             const query = this.repo.createQueryBuilder('contact');
             if (user.role !== Constants.ADMIN) {
                 query.where('contact.userId = :userId', { userId: user.id });
@@ -55,14 +55,14 @@ export class ContactsService {
             const [data, total] = await query.getManyAndCount();
             return { data, total };
         } catch (error) {
-            this.logger.error(`create() : Error fetching all contacts - ${error}`)
+            this.logger.error(`findAll() : Error fetching all contacts - ${error}`)
             throw new BadRequestException('Failed to fetch contacts');
         }
     }
 
     async findOne(id: string, user: User) {
         try {
-            this.logger.log(`create() : Fetch all contacts`)
+            this.logger.log(`findOne() : Fetch all contacts`)
             if (user.role == Constants.ADMIN) {
                 const contact = await this.repo.findOne({ where: { id } });
                 if (!contact) throw new NotFoundException('Contact not found');

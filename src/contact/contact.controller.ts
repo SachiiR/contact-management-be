@@ -33,10 +33,6 @@ export class ContactsController {
     return this.contactsService.findAll(req.user, selectedUserId, page, limit, search, sortBy, order);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string, @Request() req: any) {
-  //   return this.contactsService.findOne(id, req.user);
-  // }
 
   @Put(':id')
   update(@Param('id') id: string, @Body() body: Contact) {
