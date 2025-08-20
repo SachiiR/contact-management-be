@@ -5,7 +5,6 @@ import { Contact } from './entity/contact.entity';
 import { User } from '../user/entity/user.entity';
 import { Constants } from 'src/shared/constants';
 
-
 @Injectable()
 export class ContactsService {
     private readonly logger = new Logger(ContactsService.name)
@@ -33,7 +32,29 @@ export class ContactsService {
         }
     }
 
-    async findAll(user: User, selectedUserId: string, page: number, limit: number, search: string, sortBy: string, order: string) {
+    async findAll(page: number, limit: number, search: string, sortBy: string, order: string) {
+        try {
+            this.logger.log(`findAll() : Fetch all contacts`)
+            const query = this.repo.createQueryBuilder('contact');
+            if (search) {
+                query.andWhere('(contact.name ILIKE :search OR contact.email ILIKE :search)', { search: `%${search}%` });
+            }
+
+            query.orderBy(`contact.${sortBy}`, order as 'ASC' | 'DESC');
+
+            // Pagination
+            query.skip((page - 1) * limit).take(limit);
+
+            // Execute
+            const [data, total] = await query.getManyAndCount();
+            return { data, total };
+        } catch (error) {
+            this.logger.error(`findAll() : Error fetching all contacts - ${error}`)
+            throw new BadRequestException('Failed to fetch contacts');
+        }
+    }
+
+    async findByUser(user: User, selectedUserId: string, page: number, limit: number, search: string, sortBy: string, order: string) {
         try {
             this.logger.log(`findAll() : Fetch all contacts`)
             const query = this.repo.createQueryBuilder('contact');

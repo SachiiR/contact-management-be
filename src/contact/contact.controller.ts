@@ -6,10 +6,11 @@ import { extname, join } from 'path';
 import { diskStorage } from 'multer';
 import type { Express } from 'express';
 import { Contact } from './entity/contact.entity';
-import { User } from 'src/user/entity/user.entity';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('contacts')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard) 
 export class ContactsController {
   private readonly logger = new Logger(ContactsController.name)
   constructor(private contactsService: ContactsService) { }
@@ -20,17 +21,30 @@ export class ContactsController {
     return this.contactsService.create(body, req.user);
   }
 
-  @Get()
+  @Get('all')
+  @Roles('admin')
   findAll(@Request() req: any,
-    @Query('selectedUserId') selectedUserId: string,
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('search') search: string,
     @Query('sortBy') sortBy: string,
     @Query('order') order: string) {
     this.logger.debug(`findall() : Fetch all contacts: 
+      user - ${JSON.stringify(req.user)},`)
+    return this.contactsService.findAll( page, limit, search, sortBy, order);
+  }
+
+  @Get()
+  findByUser(@Request() req: any,
+    @Query('selectedUserId') selectedUserId: string,
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @Query('search') search: string,
+    @Query('sortBy') sortBy: string,
+    @Query('order') order: string) {
+    this.logger.debug(`findByUser() : Fetch all contacts: 
       user - ${JSON.stringify(req.user)}, selectedUserId - ${selectedUserId}`)
-    return this.contactsService.findAll(req.user, selectedUserId, page, limit, search, sortBy, order);
+    return this.contactsService.findByUser(req.user, selectedUserId, page, limit, search, sortBy, order);
   }
 
 
